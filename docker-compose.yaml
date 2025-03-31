@@ -2,22 +2,6 @@
 version: '3.8'
 
 services:
-  aop-app:
-    build: .
-    image: t1-aop-app
-    container_name: t1-aop-app-container
-    ports:
-      - "8080:8080"
-    depends_on:
-      - aop-db
-#    переменные окружения
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://aop-db:5432/t1-postgres
-#      - DB_NAME=t1-postgres
-#      - POSTGRES_USER=root
-#      - POSTGRES_PASSWORD=root
-#      - DB_HOST=db
-#      - DB_PORT=5432
   # описание контейнера db
   aop-db:
     # образ, из которого должен быть запущен контейнер
@@ -33,3 +17,14 @@ services:
       - POSTGRES_DB=t1-postgres
       - POSTGRES_USER=t1-user
       - POSTGRES_PASSWORD=sa
+  aop-app:
+    build: .
+    image: t1-aop-app
+    container_name: t1-aop-app-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - aop-db
+#    переменные окружения
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://aop-db:5432/t1-postgres

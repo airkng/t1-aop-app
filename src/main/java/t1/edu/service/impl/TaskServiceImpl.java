@@ -15,10 +15,12 @@ import t1.edu.model.User;
 import t1.edu.repository.TaskRepository;
 import t1.edu.repository.UserRepository;
 import t1.edu.service.TaskService;
+import t1.edu.utils.annotations.Loggable;
+import t1.edu.utils.annotations.AlertException;
+import t1.edu.utils.annotations.TestPerformance;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,9 @@ public class TaskServiceImpl implements TaskService {
      * @return {@link TaskResponseDto TaskResponseDto}
      */
     @Override
+    @Loggable
+    @AlertException
+    @TestPerformance
     public TaskResponseDto getTaskById(Long taskId) {
         return mapper.toResponseDto(
                 taskRepository.findById(taskId)
@@ -52,6 +57,7 @@ public class TaskServiceImpl implements TaskService {
      * @return {@link TaskResponseDto TaskResponseDto}
      */
     @Override
+    @Loggable
     public List<TaskResponseDto> getAllTasks() {
         List<TaskResponseDto> list = new ArrayList<>();
         taskRepository.findAll().forEach(s -> {
@@ -66,6 +72,7 @@ public class TaskServiceImpl implements TaskService {
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED)
+    @AlertException
     @Override
     public TaskResponseDto createTask(TaskRequestDto requestDto) {
         //Создание рандомного пользователя
@@ -102,6 +109,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Loggable
+    @AlertException
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public TaskResponseDto updateTask(TaskRequestDto requestDto, Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -124,6 +133,7 @@ public class TaskServiceImpl implements TaskService {
         return mapper.toResponseDto(taskRepository.save(task));
     }
 
+    @Loggable
     @Override
     public boolean deleteTask(Long taskId) {
         return taskRepository.deleteTaskById(taskId) == 1 ? true : false;
@@ -131,6 +141,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional(readOnly = true)
     @Override
+    @Loggable
     public List<Task> getTasksVerbose() {
         return taskRepository.findAll()
                 .stream()
