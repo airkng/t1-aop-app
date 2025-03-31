@@ -15,6 +15,7 @@ import t1.edu.model.User;
 import t1.edu.repository.TaskRepository;
 import t1.edu.repository.UserRepository;
 import t1.edu.service.TaskService;
+import t1.edu.utils.annotations.HandleResult;
 import t1.edu.utils.annotations.Loggable;
 import t1.edu.utils.annotations.AlertException;
 import t1.edu.utils.annotations.TestPerformance;
@@ -66,13 +67,34 @@ public class TaskServiceImpl implements TaskService {
         return list;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    @Loggable
+    public List<Task> getTasksVerbose() {
+        return taskRepository.findAll()
+                .stream()
+                .peek((task) -> {
+                    User u = userRepository.findById(task.getUser().getId()).get();
+                    task.setUser(User.builder()
+                            .username(u.getUsername())
+                            .password(u.getPassword())
+                            .id(u.getId())
+                            .build()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
     /**
      * Создание задачи. Если userId не существует - создается рандомный пользователь.
-     * @param requestDto
-     * @return
+     * @param requestDto {@link TaskRequestDto TaskRequestDto}
+     * @return возвращает {@link TaskResponseDto TaskResponseDto}
      */
     @Transactional(propagation = Propagation.REQUIRED)
     @AlertException
+    @Loggable
+    @TestPerformance
+    @HandleResult
     @Override
     public TaskResponseDto createTask(TaskRequestDto requestDto) {
         //Создание рандомного пользователя
@@ -84,7 +106,7 @@ public class TaskServiceImpl implements TaskService {
                     return customUser;
                 });
         if (taskRepository.existsByDescriptionAndTitleAndUserId(requestDto.getDescription(), requestDto.getTitle(), requestDto.getUserId())) {
-            throw new AlreadyExistsException(String.format(TASK_ALREADY_EXISTS, requestDto));
+            throw new AlreadyExistsException(String.format(TASK_ALREADY_EXISTS_MESSAGE, requestDto));
         }
         Task task = mapper.toModel(requestDto, user);
         return mapper.toResponseDto(taskRepository.save(task));
@@ -111,6 +133,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Loggable
     @AlertException
+    @TestPerformance
+    @HandleResult
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public TaskResponseDto updateTask(TaskRequestDto requestDto, Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -118,7 +142,7 @@ public class TaskServiceImpl implements TaskService {
                                 String.format(TASK_NOT_FOUND_MESSAGE, taskId)
                         ));
         if (taskRepository.existsByDescriptionAndTitleAndUserId(requestDto.getDescription(), requestDto.getTitle(), requestDto.getUserId())) {
-            throw new AlreadyExistsException(String.format(TASK_ALREADY_EXISTS, requestDto));
+            throw new AlreadyExistsException(String.format(TASK_ALREADY_EXISTS_MESSAGE, requestDto));
 
         }
         User customUser = generateUser(requestDto.getUserId());
@@ -139,21 +163,4 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.deleteTaskById(taskId) == 1 ? true : false;
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    @Loggable
-    public List<Task> getTasksVerbose() {
-        return taskRepository.findAll()
-                .stream()
-                .peek((task) -> {
-                    User u = userRepository.findById(task.getUser().getId()).get();
-                    task.setUser(User.builder()
-                            .username(u.getUsername())
-                            .password(u.getPassword())
-                            .id(u.getId())
-                            .build()
-                    );
-                })
-                .collect(Collectors.toList());
-    }
 }

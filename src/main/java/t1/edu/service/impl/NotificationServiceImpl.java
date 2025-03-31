@@ -9,12 +9,14 @@ import t1.edu.service.NotificationService;
 public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendExceptionMessage(String message, Exception e) {
-      log.error("Message to admin: {}.\n Exception is thrown: {}", message, e);
+      log.debug("Message to admin: {}.", message);
         System.out.println("");
         System.out.println("======================");
         System.out.println("");
-        System.out.println("SENDING NOTIFICATION");
+        System.out.println("SENDING NOTIFICATION TO ADMIN:");
+        System.out.println(e.getLocalizedMessage());
         System.out.println("");
         System.out.println("======================");
+        System.out.println("");
     }
 }
