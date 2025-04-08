@@ -3,28 +3,30 @@ version: '3.8'
 
 services:
   # описание контейнера db
-  aop-db:
+  aop_db:
     # образ, из которого должен быть запущен контейнер
     image: postgres:15-alpine
-    container_name: aop-db-container
+    container_name: aop_db_cnt
     # переменные окружения
     # volume и связанная с ним директория в контейнере
     ports:
       - "6542:5432"
     volumes:
-      - /var/lib/postgresql/data/
+      - db-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=t1-postgres
       - POSTGRES_USER=t1-user
       - POSTGRES_PASSWORD=sa
-  aop-app:
+  aop_app:
     build: .
-    image: t1-aop-app
-    container_name: t1-aop-app-container
+    image: t1_aop_app_img
+    container_name: t1_aop_app_cnt
     ports:
       - "8080:8080"
     depends_on:
-      - aop-db
+      - aop_db
 #    переменные окружения
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://aop-db:5432/t1-postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://aop_db:5432/t1-postgres
+volumes:
+  db-data:
