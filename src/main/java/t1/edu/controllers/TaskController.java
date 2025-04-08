@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import t1.edu.controllers.swagger.ITaskController;
 import t1.edu.dto.request.TaskRequestDto;
+import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
 import t1.edu.model.Task;
 import t1.edu.service.TaskService;
@@ -18,7 +19,7 @@ import java.util.List;
 public class TaskController implements ITaskController {
     private final TaskService service;
     //Просто так. Давно не использовал кастомные хэдеры при ответе, решил вспомнить ^_^
-    private static final String AUTHENTICATED_HEADER = "Authenticated";
+    private final String AUTHENTICATED_HEADER = "Authenticated";
 
     /**
      * Эндпоинт для получения задачи. В случае неправильного айди отправляет ошибку 404
@@ -56,7 +57,7 @@ public class TaskController implements ITaskController {
      */
     @Override
     @GetMapping("/verbose")
-    public List<Task> getVerboseInfo() {
+    public List<TaskFullResponseDto> getVerboseInfo() {
         return service.getTasksVerbose();
     }
 

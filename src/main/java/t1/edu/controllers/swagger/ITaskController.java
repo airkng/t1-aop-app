@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import t1.edu.dto.request.TaskRequestDto;
+import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
 import t1.edu.exceptions.ExceptionMessage;
 import t1.edu.model.Task;
@@ -52,10 +53,10 @@ public interface ITaskController {
                     responseCode = "200",
                     description = "задачи успешно найдены и отправлены",
                     headers = {@Header(name = "authenticated", description = "просто кастомный хэдер, чтобы не было скучно")},
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))}
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = TaskFullResponseDto.class))}
             )
     })
-    List<Task> getVerboseInfo();
+    List<TaskFullResponseDto> getVerboseInfo();
 
     @Operation(description = "Создание задачи")
     @ApiResponses(value = {
