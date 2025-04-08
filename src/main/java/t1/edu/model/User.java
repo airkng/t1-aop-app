@@ -10,7 +10,6 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import t1.edu.dto.request.TaskRequestDto;
+import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
 import t1.edu.exceptions.AlreadyExistsException;
 import t1.edu.exceptions.NotFoundException;
@@ -39,6 +40,7 @@ public class TaskServiceImpl implements TaskService {
      * Получение задачи по уникальному идентификатору. В случае, если задачи не существует происходит выброс исключения
      * @param taskId уникальный идентификатор задачи
      * @return {@link TaskResponseDto TaskResponseDto}
+     * @throws NotFoundException исключение, связанное с отсутствием сущности
      */
     @Override
     @Loggable
@@ -70,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional(readOnly = true)
     @Override
     @Loggable
-    public List<Task> getTasksVerbose() {
+    public List<TaskFullResponseDto> getTasksVerbose() {
         return taskRepository.findAll()
                 .stream()
                 .peek((task) -> {
@@ -82,6 +84,7 @@ public class TaskServiceImpl implements TaskService {
                             .build()
                     );
                 })
+                .map(mapper::toFullResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -145,12 +148,10 @@ public class TaskServiceImpl implements TaskService {
             throw new AlreadyExistsException(String.format(TASK_ALREADY_EXISTS_MESSAGE, requestDto));
 
         }
-        User customUser = generateUser(requestDto.getUserId());
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseGet(() -> {
-                    userRepository.saveCustomUser(customUser.getUsername(), customUser.getPassword(), customUser.getId());
-                    return customUser;
-                });
+                        .orElseThrow(() -> new NotFoundException(
+                                String.format(USER_NOT_FOUND_MESSAGE, requestDto.getUserId())
+                        ));
         task.setDescription(requestDto.getDescription() == null ? task.getDescription() : requestDto.getDescription());
         task.setTitle(requestDto.getTitle() == null ? task.getTitle() : requestDto.getTitle());
         task.setUser(user);
