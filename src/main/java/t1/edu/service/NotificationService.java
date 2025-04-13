@@ -1,5 +1,8 @@
 package t1.edu.service;
 
 public interface NotificationService {
-    public void sendExceptionMessage(String message, Exception e);
+    void sendExceptionMessage(String message, Exception e, String mailTo);
+
+    boolean sendMessage(String message, String mailTo);
+
 }
