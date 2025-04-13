@@ -23,3 +23,31 @@ spring:
     sql:
         init:
             mode: always
+    mail:
+        host: smtp.yandex.ru
+        username: username
+        password: "****"
+        port: '465'
+        ssl:
+            enabled: true
+    messages:
+        encoding: utf-8
+    main:
+        allow-circular-references: true
+t1:
+    kafka:
+        topic:
+            name: "taskStatus"
+        consumer:
+            props:
+                servers: "localhost:9092"
+                groupId: "taskConsumerGroup"
+                maxPollRecords: 3
+                enableAutoCommit: false
+                sessionTimeoutMs: 10000
+        producer:
+            props:
+                enable: true
+                servers: "localhost:9092"
+                sessionTimeoutMs: 10000
+                enableIdempotence: false

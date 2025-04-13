@@ -42,7 +42,7 @@ public class LoggingAop {
     public void sendInfo(JoinPoint joinPoint, RuntimeException exception) {
         log.error("Exception was occured in: {} .Parameters: {}", joinPoint.getSignature(), joinPoint.getArgs());
         log.error("Exception message is: {}", exception.getMessage());
-        notificationService.sendExceptionMessage("Хьюстон, у нас проблемы.", exception);
+        notificationService.sendExceptionMessage("Хьюстон, у нас проблемы.", exception, "delcher.dev@gmail.com");
     }
 
     @AfterReturning(
@@ -74,6 +74,23 @@ public class LoggingAop {
         } else {
             log.info(PERFORMANCE_MESSAGE, jp.getSignature(), jp.getArgs(), result);
         }
+        return proceeded;
+    }
+
+    @Around("@annotation(t1.edu.utils.annotations.Loggable) && execution(* t1.edu.kafka.KafkaTaskConsumer.*(..))")
+    public Object handleKafkaConsumer(ProceedingJoinPoint jp) throws Throwable {
+        log.info(KAFKA_START_HANDLING_MESSAGE, jp.getSignature(), jp.getArgs()[2], jp.getArgs()[3]);
+        Object proceeded;
+        try {
+            proceeded = jp.proceed();
+        } catch (Throwable throwable) {
+            if (throwable instanceof Exception) {
+                throw throwable;
+            }
+            log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
+            throw throwable;
+        }
+        log.info(KAFKA_END_HANDLING_MESSAGE, jp.getSignature());
         return proceeded;
     }
 

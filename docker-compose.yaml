@@ -6,7 +6,7 @@ services:
   aop_db:
     # образ, из которого должен быть запущен контейнер
     image: postgres:15-alpine
-    container_name: aop_db_cnt
+    container_name: t1_aop_db_cnt
     # переменные окружения
     # volume и связанная с ним директория в контейнере
     ports:
@@ -17,6 +17,7 @@ services:
       - POSTGRES_DB=t1-postgres
       - POSTGRES_USER=t1-user
       - POSTGRES_PASSWORD=sa
+  #бэкенд приложение
   aop_app:
     build: .
     image: t1_aop_app_img
@@ -28,5 +29,43 @@ services:
 #    переменные окружения
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://aop_db:5432/t1-postgres
+  zookeeper_t1:
+    image: confluentinc/cp-zookeeper:5.5.0
+    container_name: zookeeper_t1_cnt
+    hostname: zookeeper_t1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2182:2182"
+  kafka_t1:
+    image: confluentinc/cp-kafka
+    container_name: kafka_t1_cnt
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    depends_on:
+      - zookeeper_t1
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper_t1:2182"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      #KAFKA_LISTENERS: PLAINTEXT://:29092,DOCKER_EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_t1:29092,PLAINTEXT_HOST://localhost:9092
+     # KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop_cnt
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka_t1:29092"
+    depends_on:
+      - kafka_t1
 volumes:
   db-data:
