@@ -25,8 +25,8 @@ spring:
             mode: always
     mail:
         host: smtp.yandex.ru
-        username: antonovsacha@yandex.ru
-        password: "password"
+        username: antonovsacha@yandex.ru #todo: добавить свои данные
+        password: "password" #todo: добавить  свои данные
         port: '465'
         ssl:
             enabled: true
