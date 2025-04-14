@@ -11,4 +11,6 @@ public class CommonMessages {
     public static final String HANDLE_RESULT_MESSAGE = "Success execution of method. Result: {}";
     public static final String KAFKA_START_HANDLING_MESSAGE = "Start handling kafka messages from {}. Topic: {}, key: {}";
     public static final String KAFKA_END_HANDLING_MESSAGE = "End of handling kafka messages from {}.";
+    public static final String KAFKA_START_PRODUCING_MESSAGE = "Start produce kafka messages from {}. Value: {}.";
+    public static final String KAFKA_END_PRODUCING_MESSAGE = "End of produce kafka messages from {}.";
 }

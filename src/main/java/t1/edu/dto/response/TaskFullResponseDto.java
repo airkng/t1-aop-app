@@ -10,6 +10,7 @@ import lombok.*;
 public class TaskFullResponseDto {
     private Long id;
     private String description;
+    private String status;
     private String title;
     private UserResponseDto user;
 }

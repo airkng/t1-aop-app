@@ -12,6 +12,7 @@ import lombok.*;
 public class TaskRequestDto {
     private String description;
     private String title;
+    private String status;
     @NotNull
     private Long userId;
 }

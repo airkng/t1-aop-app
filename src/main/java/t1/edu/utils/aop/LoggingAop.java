@@ -94,5 +94,22 @@ public class LoggingAop {
         return proceeded;
     }
 
+    @Around("@annotation(t1.edu.utils.annotations.Loggable) && execution(* t1.edu.kafka.KafkaTaskProducer.*(..))")
+    public Object handleKafkaProducer(ProceedingJoinPoint jp) throws Throwable {
+        log.info(KAFKA_START_PRODUCING_MESSAGE, jp.getSignature(), jp.getArgs()[0]);
+        Object proceeded;
+        try {
+            proceeded = jp.proceed();
+        } catch (Throwable throwable) {
+            if (throwable instanceof RuntimeException) {
+                throw throwable;
+            }
+            log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
+            throw throwable;
+        }
+        log.info(KAFKA_END_PRODUCING_MESSAGE, jp.getSignature());
+        return proceeded;
+    }
+
 
 }

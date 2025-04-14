@@ -10,11 +10,13 @@ import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
 import t1.edu.exceptions.AlreadyExistsException;
 import t1.edu.exceptions.NotFoundException;
+import t1.edu.kafka.KafkaTaskProducer;
 import t1.edu.mappers.TaskMapper;
 import t1.edu.model.Task;
 import t1.edu.model.User;
 import t1.edu.repository.TaskRepository;
 import t1.edu.repository.UserRepository;
+import t1.edu.service.NotificationService;
 import t1.edu.service.TaskService;
 import t1.edu.utils.annotations.HandleResult;
 import t1.edu.utils.annotations.Loggable;
@@ -31,6 +33,7 @@ import static t1.edu.utils.CommonMessages.*;
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
+    private final KafkaTaskProducer kafkaTaskProducer;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapper mapper;
@@ -154,7 +157,9 @@ public class TaskServiceImpl implements TaskService {
                         ));
         task.setDescription(requestDto.getDescription() == null ? task.getDescription() : requestDto.getDescription());
         task.setTitle(requestDto.getTitle() == null ? task.getTitle() : requestDto.getTitle());
+        task.setStatus(requestDto.getStatus() == null ? task.getStatus() : requestDto.getStatus());
         task.setUser(user);
+        kafkaTaskProducer.produceEvent(mapper.toKafkaDto(task));
         return mapper.toResponseDto(taskRepository.save(task));
     }
 

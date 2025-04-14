@@ -1,6 +1,7 @@
 package t1.edu.mappers;
 
 import org.springframework.stereotype.Component;
+import t1.edu.dto.TaskKafkaDto;
 import t1.edu.dto.request.TaskRequestDto;
 import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
@@ -15,6 +16,7 @@ public class TaskMapper {
                 .id(task.getId())
                 .userId(task.getUser().getId())
                 .description(task.getDescription())
+                .status(task.getStatus())
                 .title(task.getTitle())
                 .build();
     }
@@ -23,6 +25,7 @@ public class TaskMapper {
         return Task.builder()
                 .user(user)
                 .description(dto.getDescription())
+                .status(dto.getStatus())
                 .title(dto.getTitle())
                 .build();
     }
@@ -32,6 +35,7 @@ public class TaskMapper {
                 .id(task.getId())
                 .title(task.getTitle())
                 .description(task.getDescription())
+                .status(task.getStatus())
                 .user(getUserResponseDto(task.getUser()))
                 .build();
     }
@@ -42,5 +46,12 @@ public class TaskMapper {
                 .password(user.getPassword())
                 .build();
 
+    }
+
+    public TaskKafkaDto toKafkaDto(Task task) {
+        return TaskKafkaDto.builder()
+                .id(task.getId().toString())
+                .status(task.getStatus())
+                .build();
     }
 }

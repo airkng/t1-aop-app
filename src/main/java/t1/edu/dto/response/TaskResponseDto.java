@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class TaskResponseDto {
     private Long id;
     private String description;
+    private String status;
     private String title;
     private Long userId;
 }

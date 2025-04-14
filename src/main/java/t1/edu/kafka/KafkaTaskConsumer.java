@@ -7,6 +7,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import t1.edu.dto.TaskKafkaDto;
 import t1.edu.service.NotificationService;
 import t1.edu.utils.annotations.Loggable;
@@ -22,6 +23,7 @@ public class KafkaTaskConsumer {
             topics = "${t1.kafka.topic.name}",
             containerFactory = "kafkaListenerContainer"
     )
+    @Transactional
     @Loggable
     public void listener(@Payload List<TaskKafkaDto> dtos,
                          Acknowledgment acks,

@@ -25,8 +25,8 @@ spring:
             mode: always
     mail:
         host: smtp.yandex.ru
-        username: username
-        password: "****"
+        username: antonovsacha@yandex.ru
+        password: "password"
         port: '465'
         ssl:
             enabled: true
@@ -38,6 +38,8 @@ t1:
     kafka:
         topic:
             name: "taskStatus"
+            partition-count: 1
+            enable: false
         consumer:
             props:
                 servers: "localhost:9092"
