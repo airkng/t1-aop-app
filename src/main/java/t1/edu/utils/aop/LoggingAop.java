@@ -23,16 +23,14 @@ public class LoggingAop {
     public void loggingMethodBefore(JoinPoint joinPoint) {
         Signature signature = joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
-        //лучше уровень лога поменять на trace в будущем. Пока что дебажить неудобно
-        log.info(TRACE_METHOD_CALLING, signature.toString(), args);
+        log.debug(TRACE_METHOD_CALLING, signature.toString(), args);
     }
 
     @After("execution(* t1.edu.service.impl.TaskServiceImpl.*(..)) && @annotation(t1.edu.utils.annotations.Loggable)")
     public void loggingMethodAfter(JoinPoint joinPoint) {
         Signature signature = joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
-        //лучше уровень лога поменять на trace в будущем. Пока что дебажить неудобно
-        log.info(TRACE_METHOD_CALLING_END, signature.toString(), args);
+        log.debug(TRACE_METHOD_CALLING_END, signature.toString(), args);
     }
 
     @AfterThrowing(
@@ -42,7 +40,7 @@ public class LoggingAop {
     public void sendInfo(JoinPoint joinPoint, RuntimeException exception) {
         log.error("Exception was occured in: {} .Parameters: {}", joinPoint.getSignature(), joinPoint.getArgs());
         log.error("Exception message is: {}", exception.getMessage());
-        notificationService.sendExceptionMessage("Хьюстон, у нас проблемы.", exception);
+        notificationService.sendExceptionMessage("Хьюстон, у нас проблемы.", exception, "delcher.dev@gmail.com");
     }
 
     @AfterReturning(
@@ -60,10 +58,9 @@ public class LoggingAop {
         Object proceeded;
         try {
             proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Throwable throwable) {
-            if (throwable instanceof RuntimeException) {
-                throw throwable;
-            }
             log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
             throw throwable;
         }
@@ -74,6 +71,38 @@ public class LoggingAop {
         } else {
             log.info(PERFORMANCE_MESSAGE, jp.getSignature(), jp.getArgs(), result);
         }
+        return proceeded;
+    }
+
+    @Around("@annotation(t1.edu.utils.annotations.Loggable) && execution(* t1.edu.kafka.KafkaTaskConsumer.*(..))")
+    public Object handleKafkaConsumer(ProceedingJoinPoint jp) throws Throwable {
+        log.info(KAFKA_START_HANDLING_MESSAGE, jp.getSignature(), jp.getArgs()[2], jp.getArgs()[3]);
+        Object proceeded;
+        try {
+            proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable throwable) {
+            log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
+            throw throwable;
+        }
+        log.info(KAFKA_END_HANDLING_MESSAGE, jp.getSignature());
+        return proceeded;
+    }
+
+    @Around("@annotation(t1.edu.utils.annotations.Loggable) && execution(* t1.edu.kafka.KafkaTaskProducer.*(..))")
+    public Object handleKafkaProducer(ProceedingJoinPoint jp) throws Throwable {
+        log.info(KAFKA_START_PRODUCING_MESSAGE, jp.getSignature(), jp.getArgs()[0]);
+        Object proceeded;
+        try {
+            proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable throwable) {
+            log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
+            throw throwable;
+        }
+        log.info(KAFKA_END_PRODUCING_MESSAGE, jp.getSignature());
         return proceeded;
     }
 
