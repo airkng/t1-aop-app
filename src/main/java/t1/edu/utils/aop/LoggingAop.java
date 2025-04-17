@@ -23,16 +23,14 @@ public class LoggingAop {
     public void loggingMethodBefore(JoinPoint joinPoint) {
         Signature signature = joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
-        //лучше уровень лога поменять на trace в будущем. Пока что дебажить неудобно
-        log.info(TRACE_METHOD_CALLING, signature.toString(), args);
+        log.debug(TRACE_METHOD_CALLING, signature.toString(), args);
     }
 
     @After("execution(* t1.edu.service.impl.TaskServiceImpl.*(..)) && @annotation(t1.edu.utils.annotations.Loggable)")
     public void loggingMethodAfter(JoinPoint joinPoint) {
         Signature signature = joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
-        //лучше уровень лога поменять на trace в будущем. Пока что дебажить неудобно
-        log.info(TRACE_METHOD_CALLING_END, signature.toString(), args);
+        log.debug(TRACE_METHOD_CALLING_END, signature.toString(), args);
     }
 
     @AfterThrowing(
@@ -60,10 +58,9 @@ public class LoggingAop {
         Object proceeded;
         try {
             proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Throwable throwable) {
-            if (throwable instanceof RuntimeException) {
-                throw throwable;
-            }
             log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
             throw throwable;
         }
@@ -83,10 +80,9 @@ public class LoggingAop {
         Object proceeded;
         try {
             proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Throwable throwable) {
-            if (throwable instanceof Exception) {
-                throw throwable;
-            }
             log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
             throw throwable;
         }
@@ -100,10 +96,9 @@ public class LoggingAop {
         Object proceeded;
         try {
             proceeded = jp.proceed();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Throwable throwable) {
-            if (throwable instanceof RuntimeException) {
-                throw throwable;
-            }
             log.error("Серьезная ошибка во время выполнения процесса: {}", jp.getSignature());
             throw throwable;
         }

@@ -13,6 +13,7 @@ import t1.edu.exceptions.NotFoundException;
 import t1.edu.kafka.KafkaTaskProducer;
 import t1.edu.mappers.TaskMapper;
 import t1.edu.model.Task;
+import t1.edu.model.TaskStatus;
 import t1.edu.model.User;
 import t1.edu.repository.TaskRepository;
 import t1.edu.repository.UserRepository;
@@ -157,9 +158,16 @@ public class TaskServiceImpl implements TaskService {
                         ));
         task.setDescription(requestDto.getDescription() == null ? task.getDescription() : requestDto.getDescription());
         task.setTitle(requestDto.getTitle() == null ? task.getTitle() : requestDto.getTitle());
-        task.setStatus(requestDto.getStatus() == null ? task.getStatus() : requestDto.getStatus());
         task.setUser(user);
-        kafkaTaskProducer.produceEvent(mapper.toKafkaDto(task));
+        TaskStatus status = task.getStatus();
+        if (requestDto.getStatus() != null && (!status.toString().equalsIgnoreCase(requestDto.getStatus()))
+        ) {
+            task.setStatus(TaskStatus.valueOf(requestDto.getStatus().toUpperCase()));
+            Task saved = taskRepository.save(task);
+            taskRepository.flush();
+            kafkaTaskProducer.produceEvent(mapper.toKafkaDto(task));
+            return mapper.toResponseDto(saved);
+        }
         return mapper.toResponseDto(taskRepository.save(task));
     }
 

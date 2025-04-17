@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @RequiredArgsConstructor
 public class MessageJsonDeserializer<T> extends JsonDeserializer<T> {
+
     private String getErrorMessage(byte[] data) {
         return new String(data, StandardCharsets.UTF_8);
     }

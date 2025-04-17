@@ -4,12 +4,12 @@ import lombok.Setter;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -25,6 +25,7 @@ import java.util.Map;
 @Setter
 public class KafkaProducerConfig {
     private Map<String, Object> props;
+    @Setter(onMethod_ = {@Autowired})
     private NewTopic topic;
 
     @Bean
@@ -45,12 +46,10 @@ public class KafkaProducerConfig {
     @Bean
     @ConditionalOnProperty(value = "t1.kafka.producer.props.enable", havingValue = "true", matchIfMissing = true)
     public KafkaTaskProducer clientProducer(
-            @Qualifier("taskKafkaTemplate") KafkaTemplate<String, TaskKafkaDto> template,
-            Environment env
+            @Qualifier("taskKafkaTemplate") KafkaTemplate<String, TaskKafkaDto> template
     ) {
-        template.setDefaultTopic("${t1.kafka.topic.name}");
-        return new KafkaTaskProducer(template, env, topic);
-
+        template.setDefaultTopic("${t1.kafka.topic.defaultName}");
+        return new KafkaTaskProducer(template, topic);
     }
 
 

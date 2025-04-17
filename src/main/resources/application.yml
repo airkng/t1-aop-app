@@ -40,6 +40,7 @@ t1:
             name: "taskStatus"
             partition-count: 1
             enable: false
+            defaultName: "defaultTask"
         consumer:
             props:
                 servers: "localhost:9092"

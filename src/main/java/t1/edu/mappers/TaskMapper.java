@@ -7,6 +7,7 @@ import t1.edu.dto.response.TaskFullResponseDto;
 import t1.edu.dto.response.TaskResponseDto;
 import t1.edu.dto.response.UserResponseDto;
 import t1.edu.model.Task;
+import t1.edu.model.TaskStatus;
 import t1.edu.model.User;
 
 @Component
@@ -16,7 +17,7 @@ public class TaskMapper {
                 .id(task.getId())
                 .userId(task.getUser().getId())
                 .description(task.getDescription())
-                .status(task.getStatus())
+                .status(task.getStatus().toString())
                 .title(task.getTitle())
                 .build();
     }
@@ -25,7 +26,7 @@ public class TaskMapper {
         return Task.builder()
                 .user(user)
                 .description(dto.getDescription())
-                .status(dto.getStatus())
+                .status(TaskStatus.valueOf(dto.getStatus()))
                 .title(dto.getTitle())
                 .build();
     }
@@ -35,10 +36,11 @@ public class TaskMapper {
                 .id(task.getId())
                 .title(task.getTitle())
                 .description(task.getDescription())
-                .status(task.getStatus())
+                .status(task.getStatus().toString())
                 .user(getUserResponseDto(task.getUser()))
                 .build();
     }
+
 
     private UserResponseDto getUserResponseDto(User user) {
         return UserResponseDto.builder()
@@ -51,7 +53,7 @@ public class TaskMapper {
     public TaskKafkaDto toKafkaDto(Task task) {
         return TaskKafkaDto.builder()
                 .id(task.getId().toString())
-                .status(task.getStatus())
+                .status(task.getStatus().toString())
                 .build();
     }
 }
