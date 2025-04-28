@@ -1,5 +1,6 @@
 package t1.edu.kafka;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class KafkaTaskConsumer {
     private final NotificationService notificationService;
+    private Boolean isMessageConsumed;
 
     @KafkaListener(id = "${t1.kafka.consumer.props.groupId}",
             topics = "${t1.kafka.topic.name}",
@@ -37,7 +39,14 @@ public class KafkaTaskConsumer {
                 notificationService.sendMessage(format, "delcher.dev@gmail.com");
             }
         } finally {
+            isMessageConsumed = true;
             acks.acknowledge();
         }
+    }
+
+    public Boolean isMessageConsumed() {
+        boolean res = isMessageConsumed;
+        isMessageConsumed = false;
+        return res;
     }
 }

@@ -5,12 +5,14 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import t1.edu.service.NotificationService;
 
 import static t1.edu.utils.CommonMessages.*;
 
 @Component
+@Profile("test")
 @Aspect
 @RequiredArgsConstructor
 public class LoggingAop {
