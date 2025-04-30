@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TaskController.class)
 @AutoConfigureMockMvc
-public class TaskControllerTest {
+public class TaskControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean

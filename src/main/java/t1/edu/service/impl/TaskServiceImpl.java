@@ -174,7 +174,7 @@ public class TaskServiceImpl implements TaskService {
     @Loggable
     @Override
     public boolean deleteTask(Long taskId) {
-        return taskRepository.deleteTaskById(taskId) == 1 ? true : false;
+       return taskRepository.deleteTaskById(taskId) == 1 ? true : false;
     }
 
 }

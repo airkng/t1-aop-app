@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import t1.edu.model.User;
 
+import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
@@ -14,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param(value = "username") String username,
             @Param(value = "password") String password,
             @Param(value = "id") Long id);
+
+    Optional<User> findByUsername(String username);
 }
